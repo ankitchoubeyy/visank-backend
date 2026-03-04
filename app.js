@@ -6,7 +6,6 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
 const hpp = require("hpp");
-const xss = require("xss-clean");
 
 const apiLimiter = require("./middlewares/rateLimiter");
 const errorHandler = require("./middlewares/errorHandler");
@@ -23,7 +22,6 @@ const app = express();
 
 app.use(helmet()); // secure HTTP headers
 app.use(hpp()); // prevent parameter pollution
-app.use(xss()); // prevent XSS attacks
 
 
 

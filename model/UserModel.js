@@ -66,19 +66,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-
-  next();
-});
-
-userSchema.methods.comparePassword = async function (password) {
-  return bcrypt.compare(password, this.password);
-};
-
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;

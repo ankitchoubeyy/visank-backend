@@ -70,6 +70,11 @@ const login = async (req, res, next) => {
     // compare password
     const isMatch = await bcrypt.compare(password, user.password);
 
+    console.log(isMatch, "isMatch")
+    console.log(password, "password")
+    console.log(user.password, "user.password")
+
+
     if (!isMatch) {
       return res.status(400).json({
         success: false,

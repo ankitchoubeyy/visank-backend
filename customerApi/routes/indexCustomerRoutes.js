@@ -4,6 +4,7 @@ const customerAuth = require("../../middlewares/customerAuth");
 
 const authRoutes = require("./authRoutes");
 const profileRoutes = require("./userProfileRoutes");
+const addressRoutes = require("./addressRoutes");
 // const cartRoutes = require("./cartRoutes");
 // const wishlistRoutes = require("./wishlistRoutes");
 
@@ -24,6 +25,7 @@ router.use("/auth", authRoutes);
 router.use(customerAuth);
 
 router.use("/profile", profileRoutes);
+router.use("/address", addressRoutes);
 // router.use("/cart", cartRoutes);
 // router.use("/wishlist", wishlistRoutes);
 

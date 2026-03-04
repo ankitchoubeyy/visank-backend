@@ -1,13 +1,15 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
+
 
 /**
  * Generate JWT token for provider
- * @param {string} providerId - MongoDB ObjectId
+ * @param {string} userId - MongoDB ObjectId
  */
-export function generateToken(providerId) {
+
+module.exports = function generateToken(userId) {
   return jwt.sign(
     {
-      id: providerId,
+      id: userId,
     },
     process.env.JWT_SECRET,
     {

@@ -55,9 +55,10 @@ const categorySchema = new mongoose.Schema(
   },
 );
 
-// Generate slug automatically
-categorySchema.pre("save", async function (next) {
-  if (!this.isModified("name")) return next();
+// Generate slug automatically before saving
+categorySchema.pre("save", async function () {
+  // 1. If name is not modified, just return (Mongoose handles the rest)
+  if (!this.isModified("name")) return;
 
   let slug = slugify(this.name, {
     lower: true,
@@ -65,9 +66,8 @@ categorySchema.pre("save", async function (next) {
     trim: true,
   });
 
-  // ensure slug uniqueness
+  // 2. Ensure slug uniqueness
   let existingCategory = await mongoose.models.Category.findOne({ slug });
-
   let counter = 1;
 
   while (existingCategory) {
@@ -77,8 +77,6 @@ categorySchema.pre("save", async function (next) {
   }
 
   this.slug = slug;
-
-  next();
 });
 
 // Indexes for performance

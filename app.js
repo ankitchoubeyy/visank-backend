@@ -10,7 +10,7 @@ const hpp = require("hpp");
 const apiLimiter = require("./middlewares/rateLimiter");
 const errorHandler = require("./middlewares/errorHandler");
 const customerRoutes = require("./customerApi/routes/indexCustomerRoutes");
-// const adminRoutes = require("./adminApi/routes/indexAdminRoutes");
+const adminRoutes = require("./adminApi/routes/adminIndexRoutes");
 
 const app = express();
 
@@ -93,7 +93,7 @@ app.get("/health", (req, res) => {
 --------------------------*/
 
 app.use("/api/customer", customerRoutes);
-// app.use("/api/admin", adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 

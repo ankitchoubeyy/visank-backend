@@ -6,7 +6,6 @@ const variantSchema = new mongoose.Schema(
     sku: {
       type: String,
       required: true,
-      unique: true,
       uppercase: true,
       trim: true,
       index: true,
@@ -39,12 +38,20 @@ const variantSchema = new mongoose.Schema(
 
     price: {
       type: Number,
+      required: true,
       min: 0,
     },
 
     salePrice: {
       type: Number,
       min: 0,
+      validate: {
+        validator: function (value) {
+          if (!value) return true;
+          return value <= this.price;
+        },
+        message: "Variant sale price cannot be greater than variant price",
+      },
     },
 
     images: [
@@ -189,40 +196,27 @@ const productSchema = new mongoose.Schema(
    AUTO GENERATE UNIQUE SLUG
 ---------------------------*/
 
-productSchema.pre("save", async function (next) {
-  if (!this.isModified("title")) return next();
+productSchema.pre("save", async function () {
+  if (!this.isModified("title")) return;
 
-  let slug = slugify(this.title, {
+  const baseSlug = slugify(this.title, {
     lower: true,
     strict: true,
     trim: true,
   });
 
-  let existing = await mongoose.models.Product.findOne({ slug });
-
+  let slug = baseSlug;
   let counter = 1;
 
+  let existing = await mongoose.models.Product.findOne({ slug });
+
   while (existing) {
-    slug = `${slug}-${counter}`;
+    slug = `${baseSlug}-${counter}`;
     existing = await mongoose.models.Product.findOne({ slug });
     counter++;
   }
 
   this.slug = slug;
-
-  next();
-});
-
-/* --------------------------
-   PRICE VALIDATION
----------------------------*/
-
-productSchema.pre("save", function (next) {
-  if (this.salePrice && this.salePrice > this.basePrice) {
-    return next(new Error("Sale price cannot be greater than base price"));
-  }
-
-  next();
 });
 
 /* --------------------------

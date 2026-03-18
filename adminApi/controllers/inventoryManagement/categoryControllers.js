@@ -66,7 +66,21 @@ const createCategory = async (req, res) => {
 
 const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find({ isActive: true })
+    const { search } = req.query;
+
+    // 1. Build the base query
+    let query = { isActive: true };
+
+    // 2. Add search logic if a keyword is provided
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 3. Execute the query
+    const categories = await Category.find(query)
       .populate("parent", "name slug")
       .sort({ sortOrder: 1, name: 1 })
       .lean();

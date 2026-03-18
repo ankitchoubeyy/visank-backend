@@ -48,35 +48,60 @@ const createProduct = async (req, res) => {
        REQUIRED FIELD VALIDATION
     ------------------------------------ */
 
-    if (!productData.title)
+    if (!productData.title) {
       return res.status(400).json({
         success: false,
         message: "Product title is required",
       });
+    }
 
-    if (!productData.description)
+    if (!productData.description) {
       return res.status(400).json({
         success: false,
         message: "Product description is required",
       });
+    }
 
-    if (!productData.basePrice)
+    if (!productData.basePrice) {
       return res.status(400).json({
         success: false,
         message: "Base price is required",
       });
+    }
 
-    if (!productData.category)
+    if (!productData.category) {
       return res.status(400).json({
         success: false,
         message: "Category is required",
       });
+    }
 
-    if (!productData.gender)
+    if (!productData.gender) {
       return res.status(400).json({
         success: false,
         message: "Gender is required",
       });
+    }
+
+    /* -----------------------------------
+       IMAGE VALIDATION
+    ------------------------------------ */
+
+    if (!productData.images || productData.images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one product image is required",
+      });
+    }
+
+    for (const image of productData.images) {
+      if (!image.url) {
+        return res.status(400).json({
+          success: false,
+          message: "Image URL is required",
+        });
+      }
+    }
 
     /* -----------------------------------
        PRICE VALIDATION
@@ -108,14 +133,21 @@ const createProduct = async (req, res) => {
         if (!variant.size) {
           return res.status(400).json({
             success: false,
-            message: "Variant size is required",
+            message: `Variant size is required for SKU ${variant.sku}`,
+          });
+        }
+
+        if (!variant.color || !variant.color.name) {
+          return res.status(400).json({
+            success: false,
+            message: `Color name is required for SKU ${variant.sku}`,
           });
         }
 
         if (variant.stock < 0) {
           return res.status(400).json({
             success: false,
-            message: "Variant stock cannot be negative",
+            message: `Stock cannot be negative for SKU ${variant.sku}`,
           });
         }
 
@@ -127,6 +159,32 @@ const createProduct = async (req, res) => {
           return res.status(400).json({
             success: false,
             message: `Sale price cannot exceed price for SKU ${variant.sku}`,
+          });
+        }
+
+        if (variant.images && variant.images.length > 0) {
+          for (const img of variant.images) {
+            if (!img.url) {
+              return res.status(400).json({
+                success: false,
+                message: `Variant image URL is required for SKU ${variant.sku}`,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    /* -----------------------------------
+       SPECIFICATION VALIDATION
+    ------------------------------------ */
+
+    if (productData.specifications && productData.specifications.length > 0) {
+      for (const spec of productData.specifications) {
+        if (!spec.key || !spec.value) {
+          return res.status(400).json({
+            success: false,
+            message: "Specification key and value are required",
           });
         }
       }
@@ -145,7 +203,12 @@ const createProduct = async (req, res) => {
       message: "Product created successfully",
       data: product,
     });
+
   } catch (error) {
+
+    /* -----------------------------------
+       DUPLICATE SKU ERROR
+    ------------------------------------ */
 
     if (error.code === 11000) {
       return res.status(400).json({
@@ -158,7 +221,8 @@ const createProduct = async (req, res) => {
       success: false,
       message: error.message || "Failed to create product",
     });
-  } 
+
+  }
 };
 
 

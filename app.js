@@ -29,14 +29,18 @@ app.use(hpp()); // prevent parameter pollution
    CORS
 --------------------------*/
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "*",
-    credentials: true
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL || "*",
+//     credentials: true
+//   })
+// );
 
+import cors from "cors";
 
+app.use(cors({
+  origin: "*", // or your frontend domain
+}));
 
 /* -------------------------
    BODY PARSER
